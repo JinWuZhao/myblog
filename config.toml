@@ -3,7 +3,7 @@ languageCode = "zh-cn"
 title = "Lambda"
 theme = "hugo-nuo"
 canonifyurls = true
-publishDir = "doc"
+publishDir = "docs"
 
 # Copyright of your post
 copyright = "©jinzhao.info"
