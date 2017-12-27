@@ -1,0 +1,39 @@
+baseURL = "https://jinzhao.info"
+languageCode = "zh-cn"
+title = "Lambda"
+theme = "hugo-nuo"
+canonifyurls = true
+publishDir = "doc"
+
+# Copyright of your post
+copyright = "©jinzhao.info"
+
+# Initial site menu, you can extend menu with content.
+[[menu.main]]
+  name = "Home"
+  weight = 10
+  identifier = "home"
+  url = "/"
+
+[[menu.main]]
+  name = "Posts"
+  weight = 20
+  identifier = "posts"
+  url = "/post/"
+
+[[menu.main]]
+  name = "Tags"
+  weight = 30
+  identifier = "tags"
+  url = "/tags/"
+
+# Add your own params here
+[params]
+  author = "jin.zhao"
+  avatar = "/img/avatar.png"
+  subtitle = "Caculations and Programming"
+  description = ""
+  paginate = 10
+
+  # Choose your social networks
+  github = "JinWuZhao"

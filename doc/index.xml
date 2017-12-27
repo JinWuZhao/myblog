@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Lambda</title>
+    <link>https://jinzhao.info/</link>
+    <description>Recent content on Lambda</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>©jinzhao.info</copyright>
+    <lastBuildDate>Wed, 27 Dec 2017 17:12:36 +0800</lastBuildDate>
+    
+	<atom:link href="https://jinzhao.info/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>博客测试</title>
+      <link>https://jinzhao.info/post/my-first-post/</link>
+      <pubDate>Wed, 27 Dec 2017 17:12:36 +0800</pubDate>
+      
+      <guid>https://jinzhao.info/post/my-first-post/</guid>
+      <description> 这是标题 这是二级标题 这是内容
+这是图片 这是链接 我的github
+这是列表  列表1 列表2 列表3  这是代码 package main import &amp;quot;fmt&amp;quot; func main() { fmt.Println(&amp;quot;hello world&amp;quot;) }  </description>
+    </item>
+    
+  </channel>
+</rss>
