@@ -1,4 +1,4 @@
-baseURL = "https://jinzhao.info"
+baseURL = "https://jinzhao.info/myblog/"
 languageCode = "zh-cn"
 title = "Lambda"
 theme = "hugo-nuo"

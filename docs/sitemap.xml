@@ -3,29 +3,29 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>https://jinzhao.info/post/my-first-post/</loc>
+    <loc>https://jinzhao.info/myblog/post/my-first-post/</loc>
     <lastmod>2017-12-27T17:12:36+08:00</lastmod>
   </url>
   
   <url>
-    <loc>https://jinzhao.info/categories/</loc>
+    <loc>https://jinzhao.info/myblog/categories/</loc>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://jinzhao.info/</loc>
-    <lastmod>2017-12-27T17:12:36+08:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://jinzhao.info/post/</loc>
+    <loc>https://jinzhao.info/myblog/</loc>
     <lastmod>2017-12-27T17:12:36+08:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://jinzhao.info/tags/</loc>
+    <loc>https://jinzhao.info/myblog/post/</loc>
+    <lastmod>2017-12-27T17:12:36+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://jinzhao.info/myblog/tags/</loc>
     <priority>0</priority>
   </url>
   
