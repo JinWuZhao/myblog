@@ -30,7 +30,7 @@ copyright = "©jinzhao.info"
 # Add your own params here
 [params]
   author = "jin.zhao"
-  avatar = "/img/avatar.png"
+  avatar = "/img/avatar.jpg"
   subtitle = "Calculations and Programming"
   description = ""
   paginate = 10
