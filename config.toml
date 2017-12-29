@@ -4,6 +4,7 @@ title = "Lambda"
 theme = "hugo-nuo"
 canonifyurls = true
 publishDir = "docs"
+pygmentsCodeFences = true
 
 # Copyright of your post
 copyright = "©jinzhao.info"
@@ -22,8 +23,14 @@ copyright = "©jinzhao.info"
   url = "/post/"
 
 [[menu.main]]
+  name = "Categories"
+  weight = 40
+  identifier = "categories"
+  url = "/categories/"
+
+[[menu.main]]
   name = "Tags"
-  weight = 30
+  weight = 50
   identifier = "tags"
   url = "/tags/"
 

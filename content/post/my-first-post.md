@@ -9,7 +9,7 @@ draft: false
 这是内容
 
 # 这是图片
-![avatar](/img/avatar.png)
+![avatar](/img/avatar.jpg)
 
 # 这是链接
 [我的github](https://jinzhao.info)
@@ -21,7 +21,7 @@ draft: false
 
 # 这是代码
 
-{{< highlight go >}}
+{{< highlight go "linenos=inline">}}
 package main
 
 import "fmt"
@@ -30,3 +30,8 @@ func main() {
     fmt.Println("hello world")
 }
 {{< /highlight >}}
+
+```idris
+main : IO ()
+main = putStrLn "hello world"
+```

@@ -20,7 +20,7 @@
       <guid>https://jinzhao.info/post/my-first-post/</guid>
       <description> 这是标题 这是二级标题 这是内容
 这是图片 这是链接 我的github
-这是列表  列表1 列表2 列表3  这是代码 package main import &amp;#34;fmt&amp;#34; func main() { fmt.Println(&amp;#34;hello world&amp;#34;) } </description>
+这是列表  列表1 列表2 列表3  这是代码 1package main 2 3import &amp;#34;fmt&amp;#34; 4 5func main() { 6 fmt.Println(&amp;#34;hello world&amp;#34;) 7} main : IO () main = putStrLn &amp;#34;hello world&amp;#34;</description>
     </item>
     
   </channel>
