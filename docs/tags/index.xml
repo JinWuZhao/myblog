@@ -7,9 +7,28 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>©jinzhao.info</copyright>
+    <lastBuildDate>Thu, 28 Dec 2017 16:59:15 +0800</lastBuildDate>
     
 	<atom:link href="https://jinzhao.info/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Dot</title>
+      <link>https://jinzhao.info/tags/dot/</link>
+      <pubDate>Thu, 28 Dec 2017 16:59:15 +0800</pubDate>
+      
+      <guid>https://jinzhao.info/tags/dot/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Graphviz</title>
+      <link>https://jinzhao.info/tags/graphviz/</link>
+      <pubDate>Thu, 28 Dec 2017 16:59:15 +0800</pubDate>
+      
+      <guid>https://jinzhao.info/tags/graphviz/</guid>
+      <description></description>
+    </item>
     
   </channel>
 </rss>

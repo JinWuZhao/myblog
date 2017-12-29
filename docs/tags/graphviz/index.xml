@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Posts on Lambda</title>
-    <link>https://jinzhao.info/post/</link>
-    <description>Recent content in Posts on Lambda</description>
+    <title>Graphviz on Lambda</title>
+    <link>https://jinzhao.info/tags/graphviz/</link>
+    <description>Recent content in Graphviz on Lambda</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>©jinzhao.info</copyright>
     <lastBuildDate>Thu, 28 Dec 2017 16:59:15 +0800</lastBuildDate>
     
-	<atom:link href="https://jinzhao.info/post/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://jinzhao.info/tags/graphviz/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
@@ -29,17 +29,6 @@ dot -Tpng interpreter.dot -o interpreter.png 于是就得到了下面这张图�
 这里生成的是png格式，也可以生成其它格式的文件，比如pprof生成的就是svg格式的。
 DOT语言介绍 这是Graphviz文档里的DOT语法：
 graph: [ strict ] (graph | digraph) [ ID ] &amp;#39;{&amp;#39; stmt_list &amp;#39;}&amp;#39; stmt_list: [ stmt [ &amp;#39;;&amp;#39; ] stmt_list ] stmt: node_stmt | edge_stmt | attr_stmt | ID &amp;#39;=&amp;#39; ID | subgraph attr_stmt: (graph | node | edge) attr_list attr_list: &amp;#39;[&amp;#39; [ a_list ] &amp;#39;]&amp;#39; [ attr_list ] a_list: ID &amp;#39;=&amp;#39; ID [ (&amp;#39;;&amp;#39; | &amp;#39;,&amp;#39;) ] [ a_list ] edge_stmt: (node_id | subgraph) edgeRHS [ attr_list ] edgeRHS: edgeop (node_id | subgraph) [ edgeRHS ] node_stmt: node_id [ attr_list ] node_id: ID [ port ] port: &amp;#39;:&amp;#39; ID [ &amp;#39;:&amp;#39; compass_pt ] | &amp;#39;:&amp;#39; compass_pt subgraph: [ subgraph [ ID ] ] &amp;#39;{&amp;#39; stmt_list &amp;#39;}&amp;#39; compass_pt: (n | ne | e | se | s | sw | w | nw | c | _) 详情请见：https://graphviz.</description>
-    </item>
-    
-    <item>
-      <title>博客测试</title>
-      <link>https://jinzhao.info/post/my-first-post/</link>
-      <pubDate>Wed, 27 Dec 2017 17:12:36 +0800</pubDate>
-      
-      <guid>https://jinzhao.info/post/my-first-post/</guid>
-      <description> 这是标题 这是二级标题 这是内容
-这是图片 这是链接 我的github
-这是列表  列表1 列表2 列表3  这是代码 1package main 2 3import &amp;#34;fmt&amp;#34; 4 5func main() { 6 fmt.Println(&amp;#34;hello world&amp;#34;) 7} main : IO () main = putStrLn &amp;#34;hello world&amp;#34;</description>
     </item>
     
   </channel>

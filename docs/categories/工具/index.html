@@ -6,7 +6,9 @@
 
   
   <title>
-  Tags | Lambda
+  Category → 工具
+  
+   | Lambda
 </title>
 
   
@@ -31,7 +33,7 @@
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Lambda" />
   <meta property="og:description" content="" />
-  <meta property="og:url" content="https://jinzhao.info/tags/" />
+  <meta property="og:url" content="https://jinzhao.info/categories/%E5%B7%A5%E5%85%B7/" />
   <meta property="og:image" content="https://jinzhao.info/img/avatar.jpg" />
 
 
@@ -40,7 +42,7 @@
 <meta name="generator" content="Hugo 0.31.1" />
 
 
-<link rel="canonical" href="https://jinzhao.info/tags/" />
+<link rel="canonical" href="https://jinzhao.info/categories/%E5%B7%A5%E5%85%B7/" />
 <link rel="alternative" href="https://jinzhao.info/index.xml" title="Lambda" type="application/atom+xml" />
 
 
@@ -146,8 +148,6 @@
       
         <li class="menu-item
             
-              is-active
-            
             
             ">
             <a href="https://jinzhao.info/tags/">Tags</a>
@@ -212,20 +212,38 @@
   </nav>
 </header>
 
-  <section class="main post-detail terms-list">
-    <header class="post-header">
-      <h1 class="post-title">Tags</h1>
+  <section class="main post-list">
+    <header class="list-header offscreen">
+      <h2 class="list-label">Posts List</h2>
     </header>
-    <div class="tags-cloud">
+    
+    
       
+        <article class="post-entry">
+  <header class="post-header">
+    <h3 class="post-title"><a href="https://jinzhao.info/post/graphviz-learning/" class="post-link">学习Graphviz</a></h3>
+    <p class="post-meta">@jin.zhao · Dec 28, 2017 · 3 min read</p>
+  </header>
+  
+  <p class="post-summary">使用go语言开发的朋友应该对pprof不会陌生，pprof可以导出像下面这种图： 那么问题来了，这是怎么生成的呢？
+答案就是――Graphviz。
+Graphviz Graphviz是一个自动化绘图的工具，用于绘制DOT语言描述的图形。
+QuickStart 废话不多说，先上个例子，安装配置不讲了自己找。
+假设我们描述一个简单的解释器的执行流程：
+1. 获取输入（getInput) 2. 解析输入字符串（parse），成功转到3，失败转到5 3. 对parse出的AST求值（evaluate），成功转到4，失败转到6 4. 输出求值结果（putResult） 5. 提示语法错误（throwSyntaxError） 6. 求值过程出现异常，比如除0等（throwRuntimeError） 创建一个文件，名为interpreter.dot，并写入以下代码：
+digraph Interpreter { getInput -&gt; parse -&gt; evaluate -&gt; putResult; parse -&gt; throwSyntaxError; evaluate -&gt; throwRuntimeError; } 在终端执行以下命令：
+dot -Tpng interpreter.dot -o interpreter.png 于是就得到了下面这张图：
+这里生成的是png格式，也可以生成其它格式的文件，比如pprof生成的就是svg格式的。
+DOT语言介绍 这是Graphviz文档里的DOT语法：
+graph: [ strict ] (graph | digraph) [ ID ] &#39;{&#39; stmt_list &#39;}&#39; stmt_list: [ stmt [ &#39;;&#39; ] stmt_list ] stmt: node_stmt | edge_stmt | attr_stmt | ID &#39;=&#39; ID | subgraph attr_stmt: (graph | node | edge) attr_list attr_list: &#39;[&#39; [ a_list ] &#39;]&#39; [ attr_list ] a_list: ID &#39;=&#39; ID [ (&#39;;&#39; | &#39;,&#39;) ] [ a_list ] edge_stmt: (node_id | subgraph) edgeRHS [ attr_list ] edgeRHS: edgeop (node_id | subgraph) [ edgeRHS ] node_stmt: node_id [ attr_list ] node_id: ID [ port ] port: &#39;:&#39; ID [ &#39;:&#39; compass_pt ] | &#39;:&#39; compass_pt subgraph: [ subgraph [ ID ] ] &#39;{&#39; stmt_list &#39;}&#39; compass_pt: (n | ne | e | se | s | sw | w | nw | c | _) 详情请见：https://graphviz.</p>
+  <footer class="post-footer">
+    <a class="read-more" href="https://jinzhao.info/post/graphviz-learning/">Read More →</a>
+  </footer>
+</article>
+
       
-        
-        <a href="https://jinzhao.info/tags/dot/" class="tag-s">dot</a>
-      
-        
-        <a href="https://jinzhao.info/tags/graphviz/" class="tag-s">graphviz</a>
-      
-    </div>
+    
+    
   </section>
   <footer class="site-footer">
   <p>© 2017 Lambda</p>

@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+
+  <meta charset="utf-8" />
+
+  
+  <title>学习Graphviz</title>
+
+  
+  
+
+
+
+
+
+  
+  <meta name="author" content="jin.zhao" />
+  <meta name="description" content="使用go语言开发的朋友应该对pprof不会陌生，pprof可以导出像下面这种图： 那么问题来了，这是怎么生成的呢？
+答案就是――Graphviz。
+Graphviz Graphviz是一个自动化绘图的工具，用于绘制DOT语言描述的图形。
+QuickStart 废话不多说，先上个例子，安装配置不讲了自己找。
+假设我们描述一个简单的解释器的执行流程：
+1. 获取输入（getInput) 2. 解析输入字符串（parse），成功转到3，失败转到5 3. 对parse出的AST求值（evaluate），成功转到4，失败转到6 4. 输出求值结果（putResult） 5. 提示语法错误（throwSyntaxError） 6. 求值过程出现异常，比如除0等（throwRuntimeError） 创建一个文件，名为interpreter.dot，并写入以下代码：
+digraph Interpreter { getInput -&amp;gt; parse -&amp;gt; evaluate -&amp;gt; putResult; parse -&amp;gt; throwSyntaxError; evaluate -&amp;gt; throwRuntimeError; } 在终端执行以下命令：
+dot -Tpng interpreter.dot -o interpreter.png 于是就得到了下面这张图：
+这里生成的是png格式，也可以生成其它格式的文件，比如pprof生成的就是svg格式的。
+DOT语言介绍 这是Graphviz文档里的DOT语法：
+graph: [ strict ] (graph | digraph) [ ID ] &amp;#39;{&amp;#39; stmt_list &amp;#39;}&amp;#39; stmt_list: [ stmt [ &amp;#39;;&amp;#39; ] stmt_list ] stmt: node_stmt | edge_stmt | attr_stmt | ID &amp;#39;=&amp;#39; ID | subgraph attr_stmt: (graph | node | edge) attr_list attr_list: &amp;#39;[&amp;#39; [ a_list ] &amp;#39;]&amp;#39; [ attr_list ] a_list: ID &amp;#39;=&amp;#39; ID [ (&amp;#39;;&amp;#39; | &amp;#39;,&amp;#39;) ] [ a_list ] edge_stmt: (node_id | subgraph) edgeRHS [ attr_list ] edgeRHS: edgeop (node_id | subgraph) [ edgeRHS ] node_stmt: node_id [ attr_list ] node_id: ID [ port ] port: &amp;#39;:&amp;#39; ID [ &amp;#39;:&amp;#39; compass_pt ] | &amp;#39;:&amp;#39; compass_pt subgraph: [ subgraph [ ID ] ] &amp;#39;{&amp;#39; stmt_list &amp;#39;}&amp;#39; compass_pt: (n | ne | e | se | s | sw | w | nw | c | _) 详情请见：https://graphviz." />
+
+  
+  
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@gohugoio" />
+    <meta name="twitter:title" content="学习Graphviz" />
+    <meta name="twitter:description" content="使用go语言开发的朋友应该对pprof不会陌生，pprof可以导出像下面这种图： 那么问题来了，这是怎么生成的呢？
+答案就是――Graphviz。
+Graphviz Graphviz是一个自动化绘图的工具，用于绘制DOT语言描述的图形。
+QuickStart 废话不多说，先上个例子，安装配置不讲了自己找。
+假设我们描述一个简单的解释器的执行流程：
+1. 获取输入（getInput) 2. 解析输入字符串（parse），成功转到3，失败转到5 3. 对parse出的AST求值（evaluate），成功转到4，失败转到6 4. 输出求值结果（putResult） 5. 提示语法错误（throwSyntaxError） 6. 求值过程出现异常，比如除0等（throwRuntimeError） 创建一个文件，名为interpreter.dot，并写入以下代码：
+digraph Interpreter { getInput -&amp;gt; parse -&amp;gt; evaluate -&amp;gt; putResult; parse -&amp;gt; throwSyntaxError; evaluate -&amp;gt; throwRuntimeError; } 在终端执行以下命令：
+dot -Tpng interpreter.dot -o interpreter.png 于是就得到了下面这张图：
+这里生成的是png格式，也可以生成其它格式的文件，比如pprof生成的就是svg格式的。
+DOT语言介绍 这是Graphviz文档里的DOT语法：
+graph: [ strict ] (graph | digraph) [ ID ] &amp;#39;{&amp;#39; stmt_list &amp;#39;}&amp;#39; stmt_list: [ stmt [ &amp;#39;;&amp;#39; ] stmt_list ] stmt: node_stmt | edge_stmt | attr_stmt | ID &amp;#39;=&amp;#39; ID | subgraph attr_stmt: (graph | node | edge) attr_list attr_list: &amp;#39;[&amp;#39; [ a_list ] &amp;#39;]&amp;#39; [ attr_list ] a_list: ID &amp;#39;=&amp;#39; ID [ (&amp;#39;;&amp;#39; | &amp;#39;,&amp;#39;) ] [ a_list ] edge_stmt: (node_id | subgraph) edgeRHS [ attr_list ] edgeRHS: edgeop (node_id | subgraph) [ edgeRHS ] node_stmt: node_id [ attr_list ] node_id: ID [ port ] port: &amp;#39;:&amp;#39; ID [ &amp;#39;:&amp;#39; compass_pt ] | &amp;#39;:&amp;#39; compass_pt subgraph: [ subgraph [ ID ] ] &amp;#39;{&amp;#39; stmt_list &amp;#39;}&amp;#39; compass_pt: (n | ne | e | se | s | sw | w | nw | c | _) 详情请见：https://graphviz." />
+    <meta name="twitter:image" content="https://jinzhao.info/img/avatar.jpg" />
+  
+
+  
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="学习Graphviz" />
+  <meta property="og:description" content="使用go语言开发的朋友应该对pprof不会陌生，pprof可以导出像下面这种图： 那么问题来了，这是怎么生成的呢？
+答案就是――Graphviz。
+Graphviz Graphviz是一个自动化绘图的工具，用于绘制DOT语言描述的图形。
+QuickStart 废话不多说，先上个例子，安装配置不讲了自己找。
+假设我们描述一个简单的解释器的执行流程：
+1. 获取输入（getInput) 2. 解析输入字符串（parse），成功转到3，失败转到5 3. 对parse出的AST求值（evaluate），成功转到4，失败转到6 4. 输出求值结果（putResult） 5. 提示语法错误（throwSyntaxError） 6. 求值过程出现异常，比如除0等（throwRuntimeError） 创建一个文件，名为interpreter.dot，并写入以下代码：
+digraph Interpreter { getInput -&amp;gt; parse -&amp;gt; evaluate -&amp;gt; putResult; parse -&amp;gt; throwSyntaxError; evaluate -&amp;gt; throwRuntimeError; } 在终端执行以下命令：
+dot -Tpng interpreter.dot -o interpreter.png 于是就得到了下面这张图：
+这里生成的是png格式，也可以生成其它格式的文件，比如pprof生成的就是svg格式的。
+DOT语言介绍 这是Graphviz文档里的DOT语法：
+graph: [ strict ] (graph | digraph) [ ID ] &amp;#39;{&amp;#39; stmt_list &amp;#39;}&amp;#39; stmt_list: [ stmt [ &amp;#39;;&amp;#39; ] stmt_list ] stmt: node_stmt | edge_stmt | attr_stmt | ID &amp;#39;=&amp;#39; ID | subgraph attr_stmt: (graph | node | edge) attr_list attr_list: &amp;#39;[&amp;#39; [ a_list ] &amp;#39;]&amp;#39; [ attr_list ] a_list: ID &amp;#39;=&amp;#39; ID [ (&amp;#39;;&amp;#39; | &amp;#39;,&amp;#39;) ] [ a_list ] edge_stmt: (node_id | subgraph) edgeRHS [ attr_list ] edgeRHS: edgeop (node_id | subgraph) [ edgeRHS ] node_stmt: node_id [ attr_list ] node_id: ID [ port ] port: &amp;#39;:&amp;#39; ID [ &amp;#39;:&amp;#39; compass_pt ] | &amp;#39;:&amp;#39; compass_pt subgraph: [ subgraph [ ID ] ] &amp;#39;{&amp;#39; stmt_list &amp;#39;}&amp;#39; compass_pt: (n | ne | e | se | s | sw | w | nw | c | _) 详情请见：https://graphviz." />
+  <meta property="og:url" content="https://jinzhao.info/post/graphviz-learning/" />
+  <meta property="og:image" content="https://jinzhao.info/img/avatar.jpg" />
+
+
+
+
+<meta name="generator" content="Hugo 0.31.1" />
+
+
+<link rel="canonical" href="https://jinzhao.info/post/graphviz-learning/" />
+<link rel="alternative" href="https://jinzhao.info/index.xml" title="Lambda" type="application/atom+xml" />
+
+
+<meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="format-detection" content="telephone=no,email=no,adress=no" />
+<meta http-equiv="Cache-Control" content="no-transform" />
+
+
+<meta name="robots" content="index,follow" />
+<meta name="referrer" content="origin-when-cross-origin" />
+
+
+
+
+
+
+
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Lambda" />
+<meta name="msapplication-tooltip" content="Lambda" />
+<meta name='msapplication-navbutton-color' content="#5fbf5e" />
+<meta name="msapplication-TileColor" content="#5fbf5e" />
+<meta name="msapplication-TileImage" content="/img/tile-image-windows.png" />
+<link rel="icon" href="https://jinzhao.info/img/favicon.ico" />
+<link rel="icon" type="image/png" sizes="16x16" href="https://jinzhao.info/img/favicon-16x16.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="https://jinzhao.info/img/favicon-32x32.png" />
+<link rel="icon" sizes="192x192" href="https://jinzhao.info/img/touch-icon-android.png" />
+<link rel="apple-touch-icon" href="https://jinzhao.info/img/touch-icon-apple.png" />
+<link rel="mask-icon" href="https://jinzhao.info/img/safari-pinned-tab.svg" color="#5fbf5e" />
+
+
+
+<link rel="stylesheet" href="//cdn.bootcss.com/video.js/6.2.8/alt/video-js-cdn.min.css" />
+
+<link rel="stylesheet" href="https://jinzhao.info/css/bundle.css" />
+
+
+  
+  <!--[if lt IE 9]>
+    <script src="//cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="//cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <script src="//cdn.bootcss.com/video.js/6.2.8/ie8/videojs-ie8.min.js"></script>
+  <![endif]-->
+
+<!--[if lte IE 11]>
+    <script src="//cdn.bootcss.com/classlist/1.1.20170427/classList.min.js"></script>
+  <![endif]-->
+
+
+<script src="//cdn.bootcss.com/object-fit-images/3.2.3/ofi.min.js"></script>
+
+
+<script src="//cdn.bootcss.com/smooth-scroll/12.1.4/js/smooth-scroll.polyfills.min.js"></script>
+
+
+</head>
+  <body>
+    
+    <div class="suspension">
+      <a title="Go to top" class="to-top is-hide"><span class="icon icon-up"></span></a>
+      
+        
+      
+    </div>
+    
+    
+  <header class="site-header">
+  <img class="avatar" src="https://jinzhao.info/img/avatar.jpg" alt="Avatar">
+  
+  <h2 class="title">Lambda</h2>
+  
+  <p class="subtitle">Calculations and Programming</p>
+  <button class="menu-toggle" type="button">
+    <span class="icon icon-menu"></span>
+  </button>
+  <nav class="site-menu collapsed">
+    <h2 class="offscreen">Main Menu</h2>
+    <ul class="menu-list">
+      
+      
+      
+      
+        <li class="menu-item
+            
+            
+            
+              is-active
+            ">
+            <a href="https://jinzhao.info/">Home</a>
+          </li>
+      
+        <li class="menu-item
+            
+            
+            ">
+            <a href="https://jinzhao.info/post/">Posts</a>
+          </li>
+      
+        <li class="menu-item
+            
+            
+            ">
+            <a href="https://jinzhao.info/categories/">Categories</a>
+          </li>
+      
+        <li class="menu-item
+            
+            
+            ">
+            <a href="https://jinzhao.info/tags/">Tags</a>
+          </li>
+      
+    </ul>
+  </nav>
+  <nav class="social-menu collapsed">
+    <h2 class="offscreen">Social Networks</h2>
+    <ul class="social-list">
+
+      
+
+      
+      <li class="social-item">
+        <a href="//github.com/JinWuZhao" title="GitHub"><span class="icon icon-github"></span></a>
+      </li>
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <li class="social-item">
+        <a href="https://jinzhao.info/index.xml"><span class="icon icon-rss" title="RSS"></span></a>
+      </li>
+
+    </ul>
+  </nav>
+</header>
+
+  <section class="main post-detail">
+    <header class="post-header">
+      <h1 class="post-title">学习Graphviz</h1>
+      <p class="post-meta">@jin.zhao · Dec 28, 2017 · 3 min read</p>
+    </header>
+    <article class="post-content">
+
+<p>使用go语言开发的朋友应该对pprof不会陌生，pprof可以导出像下面这种图：
+<img src="https://jinzhao.info/graphviz-learning/pprof.png" alt="pprof" /><br />
+那么问题来了，这是怎么生成的呢？<br />
+答案就是――Graphviz。</p>
+
+<h2 id="graphviz">Graphviz</h2>
+
+<p>Graphviz是一个自动化绘图的工具，用于绘制<a href="https://zh.wikipedia.org/wiki/DOT%E8%AF%AD%E8%A8%80">DOT语言</a>描述的图形。</p>
+
+<h2 id="quickstart">QuickStart</h2>
+
+<p>废话不多说，先上个例子，安装配置不讲了自己找。<br />
+假设我们描述一个简单的解释器的执行流程：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-plain" data-lang="plain">1. 获取输入（getInput)
+2. 解析输入字符串（parse），成功转到3，失败转到5
+3. 对parse出的AST求值（evaluate），成功转到4，失败转到6
+4. 输出求值结果（putResult）
+5. 提示语法错误（throwSyntaxError）
+6. 求值过程出现异常，比如除0等（throwRuntimeError）</code></pre></div>
+<p>创建一个文件，名为interpreter.dot，并写入以下代码：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp">digraph Interpreter {
+  getInput <span style="color:#f92672">-&gt;</span> parse <span style="color:#f92672">-&gt;</span> evaluate <span style="color:#f92672">-&gt;</span> putResult;
+  parse <span style="color:#f92672">-&gt;</span> throwSyntaxError;
+  evaluate <span style="color:#f92672">-&gt;</span> throwRuntimeError;
+}</code></pre></div>
+<p>在终端执行以下命令：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#a6e22e">dot</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">Tpng</span> <span style="color:#a6e22e">interpreter</span>.<span style="color:#a6e22e">dot</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">o</span> <span style="color:#a6e22e">interpreter</span>.<span style="color:#a6e22e">png</span></code></pre></div>
+<p>于是就得到了下面这张图：<br />
+<img src="https://jinzhao.info/graphviz-learning/interpreter.png" alt="interperter" /><br />
+这里生成的是png格式，也可以生成其它格式的文件，比如pprof生成的就是svg格式的。</p>
+
+<h2 id="dot语言介绍">DOT语言介绍</h2>
+
+<p>这是Graphviz文档里的DOT语法：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-haskell" data-lang="haskell"><span style="color:#a6e22e">graph</span><span style="color:#66d9ef">:</span> [ <span style="color:#a6e22e">strict</span> ] (<span style="color:#a6e22e">graph</span> <span style="color:#f92672">|</span> <span style="color:#a6e22e">digraph</span>) [ <span style="color:#66d9ef">ID</span> ] <span style="color:#e6db74">&#39;{&#39;</span> <span style="color:#a6e22e">stmt_list</span> <span style="color:#e6db74">&#39;}&#39;</span>
+<span style="color:#a6e22e">stmt_list</span><span style="color:#66d9ef">:</span> [ <span style="color:#a6e22e">stmt</span> [ <span style="color:#e6db74">&#39;;&#39;</span> ] <span style="color:#a6e22e">stmt_list</span> ]
+<span style="color:#a6e22e">stmt</span><span style="color:#66d9ef">:</span> <span style="color:#a6e22e">node_stmt</span>
+    <span style="color:#f92672">|</span> <span style="color:#a6e22e">edge_stmt</span>
+    <span style="color:#f92672">|</span> <span style="color:#a6e22e">attr_stmt</span>
+    <span style="color:#f92672">|</span> <span style="color:#66d9ef">ID</span> <span style="color:#e6db74">&#39;=&#39;</span> <span style="color:#66d9ef">ID</span>
+    <span style="color:#f92672">|</span> <span style="color:#a6e22e">subgraph</span>
+<span style="color:#a6e22e">attr_stmt</span><span style="color:#66d9ef">:</span> (<span style="color:#a6e22e">graph</span> <span style="color:#f92672">|</span> <span style="color:#a6e22e">node</span> <span style="color:#f92672">|</span> <span style="color:#a6e22e">edge</span>) <span style="color:#a6e22e">attr_list</span>
+<span style="color:#a6e22e">attr_list</span><span style="color:#66d9ef">:</span> <span style="color:#e6db74">&#39;[&#39;</span> [ <span style="color:#a6e22e">a_list</span> ] <span style="color:#e6db74">&#39;]&#39;</span> [ <span style="color:#a6e22e">attr_list</span> ]
+<span style="color:#a6e22e">a_list</span><span style="color:#66d9ef">:</span> <span style="color:#66d9ef">ID</span> <span style="color:#e6db74">&#39;=&#39;</span> <span style="color:#66d9ef">ID</span> [ (<span style="color:#e6db74">&#39;;&#39;</span> <span style="color:#f92672">|</span> <span style="color:#e6db74">&#39;,&#39;</span>) ] [ <span style="color:#a6e22e">a_list</span> ]
+<span style="color:#a6e22e">edge_stmt</span><span style="color:#66d9ef">:</span> (<span style="color:#a6e22e">node_id</span> <span style="color:#f92672">|</span> <span style="color:#a6e22e">subgraph</span>) <span style="color:#a6e22e">edgeRHS</span> [ <span style="color:#a6e22e">attr_list</span> ]
+<span style="color:#a6e22e">edgeRHS</span><span style="color:#66d9ef">:</span> <span style="color:#a6e22e">edgeop</span> (<span style="color:#a6e22e">node_id</span> <span style="color:#f92672">|</span> <span style="color:#a6e22e">subgraph</span>) [ <span style="color:#a6e22e">edgeRHS</span> ]
+<span style="color:#a6e22e">node_stmt</span><span style="color:#66d9ef">:</span> <span style="color:#a6e22e">node_id</span> [ <span style="color:#a6e22e">attr_list</span> ]
+<span style="color:#a6e22e">node_id</span><span style="color:#66d9ef">:</span> <span style="color:#66d9ef">ID</span> [ <span style="color:#a6e22e">port</span> ]
+<span style="color:#a6e22e">port</span><span style="color:#66d9ef">:</span> <span style="color:#e6db74">&#39;:&#39;</span> <span style="color:#66d9ef">ID</span> [ <span style="color:#e6db74">&#39;:&#39;</span> <span style="color:#a6e22e">compass_pt</span> ]
+    <span style="color:#f92672">|</span> <span style="color:#e6db74">&#39;:&#39;</span> <span style="color:#a6e22e">compass_pt</span>
+<span style="color:#a6e22e">subgraph</span><span style="color:#66d9ef">:</span> [ <span style="color:#a6e22e">subgraph</span> [ <span style="color:#66d9ef">ID</span> ] ] <span style="color:#e6db74">&#39;{&#39;</span> <span style="color:#a6e22e">stmt_list</span> <span style="color:#e6db74">&#39;}&#39;</span>
+<span style="color:#a6e22e">compass_pt</span><span style="color:#66d9ef">:</span> (<span style="color:#a6e22e">n</span> <span style="color:#f92672">|</span> <span style="color:#a6e22e">ne</span> <span style="color:#f92672">|</span> <span style="color:#a6e22e">e</span> <span style="color:#f92672">|</span> <span style="color:#a6e22e">se</span> <span style="color:#f92672">|</span> <span style="color:#a6e22e">s</span> <span style="color:#f92672">|</span> <span style="color:#a6e22e">sw</span> <span style="color:#f92672">|</span> <span style="color:#a6e22e">w</span> <span style="color:#f92672">|</span> <span style="color:#a6e22e">nw</span> <span style="color:#f92672">|</span> <span style="color:#a6e22e">c</span> <span style="color:#f92672">|</span> <span style="color:#66d9ef">_</span>)</code></pre></div>
+<p>详情请见：<a href="https://graphviz.gitlab.io/_pages/doc/info/lang.html">https://graphviz.gitlab.io/_pages/doc/info/lang.html</a><br />
+看得懂很好，看不懂也没关系😂。马上我们就开始看例子。</p>
+
+<h2 id="图形类别">图形类别</h2>
+
+<h3 id="无向图">无向图</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp">graph name {
+  a <span style="color:#f92672">--</span> b <span style="color:#f92672">--</span> c;
+  b <span style="color:#f92672">--</span> d;
+}</code></pre></div>
+<p><img src="https://jinzhao.info/graphviz-learning/graph.png" alt="graph" /></p>
+
+<h3 id="有向图">有向图</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp">digraph name {
+  a <span style="color:#f92672">-&gt;</span> b <span style="color:#f92672">-&gt;</span> c;
+  b <span style="color:#f92672">-&gt;</span> d;
+}</code></pre></div>
+<p><img src="https://jinzhao.info/graphviz-learning/digraph.png" alt="graph" /></p>
+
+<h2 id="属性">属性</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#75715e">// 这是一行注释
+</span><span style="color:#75715e"></span>digraph G {
+  size <span style="color:#f92672">=</span><span style="color:#e6db74"></span><span style="color:#e6db74">&#34;4,4&#34;</span>; <span style="color:#75715e">/* 图的大小 */</span>
+  main [shape<span style="color:#f92672">=</span>box]; <span style="color:#75715e">/* 节点的形状：盒子 */</span>
+  main <span style="color:#f92672">-&gt;</span> parse [weight<span style="color:#f92672">=</span><span style="color:#ae81ff">8</span>]; <span style="color:#75715e">/* 连线的权值，影响长度和曲率 */</span>
+  parse <span style="color:#f92672">-&gt;</span> execute;
+  main <span style="color:#f92672">-&gt;</span> init [style<span style="color:#f92672">=</span>dotted]; <span style="color:#75715e">/* 线的风格：点虚线 */</span>
+  main <span style="color:#f92672">-&gt;</span> cleanup;
+  execute <span style="color:#f92672">-&gt;</span> { make_string; printf} <span style="color:#75715e">/* 相当于：execute -&gt; make_string; execute -&gt; printf; */</span>
+  init <span style="color:#f92672">-&gt;</span> make_string;
+  edge [color<span style="color:#f92672">=</span>red]; <span style="color:#75715e">/* 全局设置线的颜色 */</span>
+  main <span style="color:#f92672">-&gt;</span> printf [style<span style="color:#f92672">=</span>bold,label<span style="color:#f92672">=</span><span style="color:#e6db74"></span><span style="color:#e6db74">&#34;100 times&#34;</span>]; <span style="color:#75715e">/* label:在连线上添加说明 */</span>
+  make_string [label<span style="color:#f92672">=</span><span style="color:#e6db74"></span><span style="color:#e6db74">&#34;make a</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">string&#34;</span>]; <span style="color:#75715e">/* label:在节点上添加说明（绘制的时候会替换掉节点的名字） */</span>
+  node [shape<span style="color:#f92672">=</span>box,style<span style="color:#f92672">=</span>filled,color<span style="color:#f92672">=</span><span style="color:#e6db74"></span><span style="color:#e6db74">&#34;.7 .3 1.0&#34;</span>]; <span style="color:#75715e">/* 全局设置节点的形状、风格、背景色 */</span>
+  execute <span style="color:#f92672">-&gt;</span> compare;
+}</code></pre></div>
+<p>效果如下：<br />
+<img src="https://jinzhao.info/graphviz-learning/attributes.png" alt="attributes" /><br />
+更多属性请见：<a href="https://graphviz.gitlab.io/_pages/doc/info/attrs.html">https://graphviz.gitlab.io/_pages/doc/info/attrs.html</a></p>
+
+<h2 id="record-shape以及label语法">record shape以及label语法</h2>
+
+<p>record shape可以依赖label语法构造更复杂的节点和图。<br />
+label语法：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#a6e22e">rlabel</span>: <span style="color:#a6e22e">field</span> ( <span style="color:#e6db74">&#39;|&#39;</span> <span style="color:#a6e22e">field</span> )<span style="color:#f92672">*</span>
+<span style="color:#a6e22e">field</span>: <span style="color:#a6e22e">boxLabel</span> | <span style="color:#960050;background-color:#1e0010">&#39;&#39;</span> <span style="color:#a6e22e">rlabel</span> <span style="color:#960050;background-color:#1e0010">&#39;&#39;</span>
+<span style="color:#a6e22e">boxLabel</span>: [ <span style="color:#e6db74">&#39;&lt;&#39;</span> <span style="color:#66d9ef">string</span> <span style="color:#e6db74">&#39;&gt;&#39;</span> ] [ <span style="color:#66d9ef">string</span> ]</code></pre></div>
+<p>例如我们描述一个二叉树：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp">digraph Tree {
+  node [shape<span style="color:#f92672">=</span>record];
+  root [label<span style="color:#f92672">=</span><span style="color:#e6db74"></span><span style="color:#e6db74">&#34;&lt;l&gt; left | &lt;e&gt; element | &lt;r&gt; right&#34;</span>]; <span style="color:#75715e">// 为left添加一个引用l
+</span><span style="color:#75715e"></span>  a1 [label<span style="color:#f92672">=</span><span style="color:#e6db74"></span><span style="color:#e6db74">&#34;&lt;l&gt; left | &lt;e&gt; element | &lt;r&gt; right&#34;</span>]; <span style="color:#75715e">// 为element添加一个引用e
+</span><span style="color:#75715e"></span>  a2 [label<span style="color:#f92672">=</span><span style="color:#e6db74"></span><span style="color:#e6db74">&#34;null | &lt;e&gt; element | null&#34;</span>];
+  b1 [label<span style="color:#f92672">=</span><span style="color:#e6db74"></span><span style="color:#e6db74">&#34;null | &lt;e&gt; element | null&#34;</span>];
+  b2 [label<span style="color:#f92672">=</span><span style="color:#e6db74"></span><span style="color:#e6db74">&#34;null | &lt;e&gt; element | null&#34;</span>];
+  <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;root&#34;</span><span style="color:#f92672">:</span>l <span style="color:#f92672">-&gt;</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;a1&#34;</span><span style="color:#f92672">:</span>e; <span style="color:#75715e">// 连接root节点的l与a1节点的e
+</span><span style="color:#75715e"></span>  <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;root&#34;</span><span style="color:#f92672">:</span>r <span style="color:#f92672">-&gt;</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;a2&#34;</span><span style="color:#f92672">:</span>e;
+  <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;a1&#34;</span><span style="color:#f92672">:</span>l <span style="color:#f92672">-&gt;</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;b1&#34;</span><span style="color:#f92672">:</span>e;
+  <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;a1&#34;</span><span style="color:#f92672">:</span>r <span style="color:#f92672">-&gt;</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;b2&#34;</span><span style="color:#f92672">:</span>e;
+}</code></pre></div>
+<p>效果如下：<br />
+<img src="https://jinzhao.info/graphviz-learning/tree.png" alt="tree" /></p>
+
+<h2 id="subgraph">subgraph</h2>
+
+<p>subgraph可以在一个图的内部定义子图。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp">digraph G {
+  subgraph cluster0 {
+    node [style<span style="color:#f92672">=</span>filled,color<span style="color:#f92672">=</span>white];
+    style <span style="color:#f92672">=</span> filled;
+    color <span style="color:#f92672">=</span> lightgrey;
+    a0 <span style="color:#f92672">-&gt;</span> a1 <span style="color:#f92672">-&gt;</span> a2 <span style="color:#f92672">-&gt;</span> a3;
+    label <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;process #1&#34;</span>;
+  }
+
+  subgraph cluster1 {
+    node [style<span style="color:#f92672">=</span>filled];
+    b0 <span style="color:#f92672">-&gt;</span> b1 <span style="color:#f92672">-&gt;</span> b2 <span style="color:#f92672">-&gt;</span> b3;
+    label <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;process #2&#34;</span>;
+    color <span style="color:#f92672">=</span> blue;
+  }
+
+  start <span style="color:#f92672">-&gt;</span> a0;
+  start <span style="color:#f92672">-&gt;</span> b0;
+  a1 <span style="color:#f92672">-&gt;</span> b3;
+  b2 <span style="color:#f92672">-&gt;</span> a3;
+  a3 <span style="color:#f92672">-&gt;</span> a0;
+  a3 <span style="color:#f92672">-&gt;</span> end;
+  b3 <span style="color:#f92672">-&gt;</span> end;
+
+  start [shape<span style="color:#f92672">=</span>Mdiamond];
+  end [shape<span style="color:#f92672">=</span>Msquare];
+}</code></pre></div>
+<p>效果如下：<br />
+<img src="https://jinzhao.info/graphviz-learning/subgraph.png" alt="subgraph" /></p>
+
+<h2 id="结束">结束</h2>
+
+<p>好啦，暂时先介绍到这里。刚刚这些只是冰山一角，更多的功能可以去查阅Graphviz<a href="https://graphviz.gitlab.io/documentation/">官方文档</a>。</p>
+</article>
+    <footer class="post-footer">
+      
+      <ul class="post-tags">
+        
+          <li><a href="https://jinzhao.info/tags/graphviz"><span class="tag">Graphviz</span></a></li>
+        
+          <li><a href="https://jinzhao.info/tags/dot"><span class="tag">DOT</span></a></li>
+        
+      </ul>
+      
+      <p class="post-copyright">
+        ©jinzhao.info
+      </p>
+    </footer>
+    
+      
+    
+  </section>
+  <footer class="site-footer">
+  <p>© 2017 Lambda</p>
+  <p>Powered by <a href="https://gohugo.io/" target="_blank">Hugo</a> with theme <a href="https://github.com/laozhu/hugo-nuo" target="_blank">Nuo</a>.</p>
+  
+</footer>
+
+
+
+<script async src="//cdn.bootcss.com/video.js/6.2.8/alt/video.novtt.min.js"></script>
+<script async src="//cdn.bootcss.com/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [['$','$'], ['\\(','\\)']],
+      displayMath: [['$$','$$'], ['\[','\]']],
+      processEscapes: true,
+      processEnvironments: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+      TeX: { equationNumbers: { autoNumber: "AMS" },
+      extensions: ["AMSmath.js", "AMSsymbols.js"] }
+    }
+  });
+</script>
+<script type="text/x-mathjax-config">
+  // Fix <code> tags after MathJax finishes running. This is a
+  // hack to overcome a shortcoming of Markdown. Discussion at
+  // https://github.com/mojombo/jekyll/issues/199
+  MathJax.Hub.Queue(() => {
+    MathJax.Hub.getAllJax().map(v => v.SourceElement().parentNode.className += ' has-jax');
+  });
+</script>
+
+<script src="https://jinzhao.info/js/bundle.js"></script>
+
+
+
+
+  </body>
+</html>
