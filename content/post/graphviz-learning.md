@@ -5,7 +5,7 @@ tags: [ "Graphviz", "DOT" ]
 categories:
     - "工具"
     - "程序语言"
-draft: true
+draft: false
 ---
 使用go语言开发的朋友应该对pprof不会陌生，pprof可以导出像下面这种图：
 ![pprof](/graphviz-learning/pprof.png)  
