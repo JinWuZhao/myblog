@@ -7,10 +7,20 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>©jinzhao.info</copyright>
-    <lastBuildDate>Thu, 28 Dec 2017 16:59:15 +0800</lastBuildDate>
+    <lastBuildDate>Sat, 30 Dec 2017 16:08:31 +0800</lastBuildDate>
     
 	<atom:link href="https://jinzhao.info/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>虚拟路由冗余协议（VRRP）详解</title>
+      <link>https://jinzhao.info/post/vrrp-protocol/</link>
+      <pubDate>Sat, 30 Dec 2017 16:08:31 +0800</pubDate>
+      
+      <guid>https://jinzhao.info/post/vrrp-protocol/</guid>
+      <description> VRRP状态切换流程 详细大图
+TODO </description>
+    </item>
     
     <item>
       <title>学习Graphviz</title>

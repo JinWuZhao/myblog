@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>网络协议 on Lambda</title>
+    <link>https://jinzhao.info/categories/%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/</link>
+    <description>Recent content in 网络协议 on Lambda</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>©jinzhao.info</copyright>
+    <lastBuildDate>Sat, 30 Dec 2017 16:08:31 +0800</lastBuildDate>
+    
+	<atom:link href="https://jinzhao.info/categories/%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>虚拟路由冗余协议（VRRP）详解</title>
+      <link>https://jinzhao.info/post/vrrp-protocol/</link>
+      <pubDate>Sat, 30 Dec 2017 16:08:31 +0800</pubDate>
+      
+      <guid>https://jinzhao.info/post/vrrp-protocol/</guid>
+      <description> VRRP状态切换流程 详细大图
+TODO </description>
+    </item>
+    
+  </channel>
+</rss>

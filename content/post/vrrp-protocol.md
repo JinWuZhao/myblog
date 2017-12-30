@@ -5,7 +5,7 @@ categories:
     - 高可用
     - 网络协议
 tags: ["VRRP"]
-draft: true
+draft: false
 ---
 ## VRRP状态切换流程
 ![vrrp-state](/vrrp-protocol/vrrp-state-simple.png)  
