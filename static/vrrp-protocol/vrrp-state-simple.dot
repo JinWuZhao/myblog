@@ -1,0 +1,18 @@
+digraph VRRPSimple {
+  splines = "ortho";
+  layout = "neato";
+  node [shape=box];
+  edge [len=2];
+  Initialize -> {
+    Master;
+    Backup;
+  };
+  Backup -> {
+    Master;
+    Initialize;
+  }
+  Master -> {
+    Backup;
+    Initialize;
+  }
+}

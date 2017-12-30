@@ -1,0 +1,104 @@
+digraph VRRP {
+  subgraph cluster0 {
+    label = "Initialize";
+    color = lightgrey;
+    node [shape=box];
+
+    init_state [shape=ellipse,label="Initialize state"];
+    c0_send_adver_packet [label="Send a ADVERTISEMENT"];
+    c0_broadcast_gratuitous_arp [label="Broadcast a gratuitous ARP\n request containing the\n virtual router MAC address"];
+    c0_set_adver_timer [label="Set the Adver_Timer\n to Advertisement_Interval"];
+    c0_to_master_state [label="Transition to\n the Master state"];
+    c0_set_master_down_timer [label="Set the Master_Down_Timer\n to Master_Down_Interval"];
+    c0_to_backup_state [label="Transition to\n the Backup state"];
+    c0_cond_priority_255 [shape=Mdiamond,label="If the Priority=255\n(VIP owner)"];
+
+    init_state -> c0_cond_priority_255;
+    c0_cond_priority_255 -> c0_send_adver_packet [weight=10,label="true"];
+    c0_send_adver_packet -> c0_broadcast_gratuitous_arp -> c0_set_adver_timer -> c0_to_master_state;
+    c0_cond_priority_255 -> c0_set_master_down_timer [label="false"];
+    c0_set_master_down_timer -> c0_to_backup_state;
+  }
+
+  subgraph cluster1 {
+    label = "Backup";
+    color = lightgrey;
+    node [shape=box];
+
+    backup_state [shape=ellipse,label="Backup state"];
+    c1_cond_shutdown [shape=Mdiamond,label="If a Shutdown event is received"];
+    c1_cancel_master_down_timer [label="Cancel the Master_Down_Timer"];
+    c1_to_init_state [label="Transition to the Initialize state"];
+    c1_cond_master_down_timer_fires [shape=Mdiamond,label="If the Master_Down_Timer fires"];
+    c1_send_adver_packet [label="Send a ADVERTISEMENT"];
+    c1_broadcast_gratuitous_arp [label="Broadcast a gratuitous ARP\n request containing the\n virtual router MAC address"];
+    c1_set_adver_timer [label="Set the Adver_Timer\n to Advertisement_Interval"];
+    c1_to_master_state [label="Transition to\n the Master state"];
+    c1_cond_adver_received [shape=Mdiamond,label="If an ADVERTISEMENT is received"];
+    c1_cond_adver_priority_iszero [shape=Mdiamond,label="If the Priority in the\n ADVERTISEMENT is Zero"];
+    c1_set_master_down_timer [label="Set the Master_Down_Timer to Skew_Time"];
+    c1_cond_adver_priority_greeter [shape=Mdiamond,label="If Preempt_Mode is False,\n or If the Priority in the\n ADVERTISEMENT is greater than\n or equal to the local Priority"];
+    c1_reset_master_down_timer [label="Reset the Master_Down_Timer\n to Master_Down_Interval"];
+    c1_discard_adver_packet [label="Discard the ADVERTISEMENT"];
+
+    backup_state -> {
+      c1_cond_shutdown;
+      c1_cond_master_down_timer_fires;
+      c1_cond_adver_received;
+    }
+    c1_cond_shutdown -> c1_cancel_master_down_timer [weight=10,label="true"];
+    c1_cancel_master_down_timer -> c1_to_init_state;
+    c1_cond_master_down_timer_fires -> c1_send_adver_packet [label="true"];
+    c1_send_adver_packet -> c1_broadcast_gratuitous_arp -> c1_set_adver_timer -> c1_to_master_state;
+    c1_cond_adver_received -> c1_cond_adver_priority_iszero [label="true"];
+    c1_cond_adver_priority_iszero -> c1_set_master_down_timer [label="true"];
+    c1_cond_adver_priority_iszero -> c1_cond_adver_priority_greeter [label="false"];
+    c1_cond_adver_priority_greeter -> c1_reset_master_down_timer [label="true"];
+    c1_cond_adver_priority_greeter -> c1_discard_adver_packet [label="false"];
+  }
+
+  subgraph cluster2 {
+    label = "Master";
+    color = lightgrey;
+    node [shape=box];
+
+    master_state [shape=ellipse,label="Master state"];
+    c2_cond_shutdown [shape=Mdiamond,label="If a Shutdown event is received"];
+    c2_cancel_adver_timer_1 [label="Cancel the Adver_Timer"];
+    c2_cancel_adver_timer_2 [label="Cancel the Adver_Timer"];
+    c2_send_adver_priority_0 [label="Send an ADVERTISEMENT with Priority = 0"];
+    c2_to_init_state [label="Transition to the Initialize state"];
+    c2_cond_adver_timer_fires [shape=Mdiamond,label="If the Adver_Timer fires"];
+    c2_send_adver_packet [label="Send an ADVERTISEMENT"];
+    c2_reset_adver_timer [label="Reset the Adver_Timer\n to Advertisement_Interval"];
+    c2_cond_adver_received [shape=Mdiamond,label="If an ADVERTISEMENT is received"];
+    c2_cond_adver_priority_iszero [shape=Mdiamond,label="If the Priority in the ADVERTISEMENT is Zero"];
+    c2_cond_adver_priority_greater [shape=Mdiamond,label="If the Priority in the ADVERTISEMENT is greater than the Priority,\n or\n If the Priority in the ADVERTISEMENT is equal to\n the local Priority and the primary IP Address of the sender\n is greater than the local primary IP Address"];
+    c2_set_master_down_timer [label="Set Master_Down_Timer to Master_Down_Interval"];
+    c2_to_backup_state [label="Transition to the Backup state"];
+    c2_discard_adver_packet [label="Discard ADVERTISEMENT"];
+
+    master_state -> {
+      c2_cond_shutdown;
+      c2_cond_adver_timer_fires;
+      c2_cond_adver_received;
+    }
+    c2_cond_shutdown -> c2_cancel_adver_timer_1 [label="true"];
+    c2_cancel_adver_timer_1 -> c2_send_adver_priority_0 -> c2_to_init_state;
+    c2_cond_adver_timer_fires -> c2_send_adver_packet [label="true"];
+    c2_send_adver_packet -> c2_reset_adver_timer;
+    c2_cond_adver_received -> c2_cond_adver_priority_iszero [label="true"];
+    c2_cond_adver_priority_iszero -> c2_send_adver_packet [label="true"];
+    c2_cond_adver_priority_iszero -> c2_cond_adver_priority_greater [label="false"];
+    c2_cond_adver_priority_greater -> c2_cancel_adver_timer_2 [label="true"];
+    c2_cancel_adver_timer_2 -> c2_set_master_down_timer -> c2_to_backup_state;
+    c2_cond_adver_priority_greater -> c2_discard_adver_packet [label="false"];
+  }
+
+  c0_to_master_state -> master_state;
+  c0_to_backup_state -> backup_state;
+  c1_to_master_state -> master_state;
+  c1_to_init_state -> init_state;
+  c2_to_backup_state -> backup_state;
+  c2_to_init_state -> init_state;
+}
