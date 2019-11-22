@@ -1,7 +1,7 @@
 ---
 title: "博客测试"
 date: 2017-12-27T17:12:36+08:00
-draft: false
+draft: true
 ---
 
 # 这是标题
