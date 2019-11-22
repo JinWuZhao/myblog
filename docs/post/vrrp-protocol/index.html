@@ -1,288 +1,336 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-cn">
-<head>
+  <head>
+    <title>虚拟路由冗余协议（VRRP）详解 // Lambda</title>
+    <meta charset="utf-8" />
+    <meta name="generator" content="Hugo 0.59.1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="author" content="jin.zhao" />
+    <meta name="description" content="" />
+    <link rel="stylesheet" href="https://jinzhao.info/css/main.min.59023e5fd38d6ecb0e1dfbb295077c3c67e00e3b9eb3feaf34b5a5e6b332897a.css" />
 
-  <meta charset="utf-8" />
+    
+    <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="虚拟路由冗余协议（VRRP）详解"/>
+<meta name="twitter:description" content="虚拟路由冗余协议（Virtual Router Redundancy Protocol，简称VRRP）用来消除静态默认路由环境下的单点故障。VRRP阐述了局域网中动态分配职责的选举协议。
+一些基本定义 VRRP路由（VRRP Router） 运行VRRP协议的路由设备，它可以参与组成一个或者多个虚拟路由。
+虚拟路由（Virtual Router） 一个受VRRP协议管理的抽象对象，作为一个共享局域网中的默认路由。它由一个虚拟路由ID（Virtual Router Identifier）和一个或多个关联的IP地址组成。一个VRRP路由可以备份一个或多个虚拟路由。
+IP地址拥有者（IP Address Owner） 将虚拟路由的IP地址作为真实接口地址的VRRP路由。这个设备可以响应发往虚拟路由IP地址的各类协议的数具包如ICMP pings、TCP连接等等。
+主IP地址（Primary IP Address） 从多个真实接口地址中选择出来的IP地址。一个可选的算法是总是选择第一个地址。VRRP通告报文（VRRP advertisements）总是使用主IP地址作为数具包的源地址。
+Master路由（Virtual Router Master） 承担转发发送给虚拟路由IP地址的数具包和应答对虚拟路由IP地址的ARP请求职责的VRRP路由。如果存在IP地址拥有者，则它总会成为Master。
+Backup路由（Virtual Router Backup） 当前Master路由失效时，可以继续承担转发职责的VRRP路由，可以存在多个。
+虚拟路由IP地址（IP address(es) associated with the virtual router） 虚拟路由在局域网中关联的IP地址，一个虚拟路由可以具有多个IP地址。
+虚拟路由MAC地址 主要功能 IP地址备份 IP地址备份是VRRP协议的主要功能。提供Master路由选举的同时还附带以下功能，协议力求：
+- 最小化黑洞时间
+- 最小化稳定状态的带宽占用和处理复杂度
+- 可用于各种支持IP流量的多路访问局域网技术
+- 提供多个虚拟路由的选举以实现负载均衡
+- 单个网段内多个逻辑IP子网的支持
+偏好路径指示 简单的Master选举模式就是把每个路由器作为Master对等地处理，竞争出胜利的一个。 但是，在一组冗余路由器中可能存在许多不同的偏好（或偏好范围）。 例如，该偏好可以基于访问链路的成本或速度，路由器性能或可靠性或其他策略考虑。 该协议应该允许以直观的方式表达该相对路径偏好，并且保证主集中到当前可用的最优路由器。
+最小化不必要的服务中断 一旦执行了Master选举，Master路由器和Backup路由器之间的任何不必要的转换都可能导致服务中断。 在Master选举之后，协议应该确保只要Master继续正常工作，任何优先级等于或者低于它的备份路由器都不会触发状态转换。
+扩展的局域网之上的高效操作 在多路访问局域网上发送IP数据包需要从IP地址映射到MAC地址。 在使用自学习网桥（透明网桥）的扩展局域网中使用虚拟路由器MAC地址会对发送到虚拟路由器的数具包的带宽开销具有显著的影响。 如果虚拟路由器MAC地址从不被用作链路层数据帧中的源地址，那么该station位置永远不会被学习，导致发送到虚拟路由器的所有数具包泛滥（flooding）。 为了提高这种环境下的效率，协议应该：
+- 使用虚拟路由器MAC地址作为Master发送的数据包中的源地址，以触发station学习
+- 转换到Master状态后立即触发一个消息以更新station学习缓存"/>
 
-  
-  <title>虚拟路由冗余协议（VRRP）详解</title>
-
-  
-  
-
-
-
-
-
-  
-  <meta name="author" content="jin.zhao" />
-  <meta name="description" content=" VRRP状态切换流程 详细大图
-TODO " />
-
-  
-  
-    <meta name="twitter:card" content="summary" />
-    <meta name="twitter:site" content="@gohugoio" />
-    <meta name="twitter:title" content="虚拟路由冗余协议（VRRP）详解" />
-    <meta name="twitter:description" content=" VRRP状态切换流程 详细大图
-TODO " />
-    <meta name="twitter:image" content="https://jinzhao.info/img/avatar.jpg" />
-  
-
-  
-  <meta property="og:type" content="article" />
-  <meta property="og:title" content="虚拟路由冗余协议（VRRP）详解" />
-  <meta property="og:description" content=" VRRP状态切换流程 详细大图
-TODO " />
-  <meta property="og:url" content="https://jinzhao.info/post/vrrp-protocol/" />
-  <meta property="og:image" content="https://jinzhao.info/img/avatar.jpg" />
-
-
-
-
-<meta name="generator" content="Hugo 0.31.1" />
-
-
-<link rel="canonical" href="https://jinzhao.info/post/vrrp-protocol/" />
-<link rel="alternative" href="https://jinzhao.info/index.xml" title="Lambda" type="application/atom+xml" />
-
-
-<meta name="renderer" content="webkit" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<meta name="format-detection" content="telephone=no,email=no,adress=no" />
-<meta http-equiv="Cache-Control" content="no-transform" />
-
-
-<meta name="robots" content="index,follow" />
-<meta name="referrer" content="origin-when-cross-origin" />
-
-
-
+    <meta property="og:title" content="虚拟路由冗余协议（VRRP）详解" />
+<meta property="og:description" content="虚拟路由冗余协议（Virtual Router Redundancy Protocol，简称VRRP）用来消除静态默认路由环境下的单点故障。VRRP阐述了局域网中动态分配职责的选举协议。
+一些基本定义 VRRP路由（VRRP Router） 运行VRRP协议的路由设备，它可以参与组成一个或者多个虚拟路由。
+虚拟路由（Virtual Router） 一个受VRRP协议管理的抽象对象，作为一个共享局域网中的默认路由。它由一个虚拟路由ID（Virtual Router Identifier）和一个或多个关联的IP地址组成。一个VRRP路由可以备份一个或多个虚拟路由。
+IP地址拥有者（IP Address Owner） 将虚拟路由的IP地址作为真实接口地址的VRRP路由。这个设备可以响应发往虚拟路由IP地址的各类协议的数具包如ICMP pings、TCP连接等等。
+主IP地址（Primary IP Address） 从多个真实接口地址中选择出来的IP地址。一个可选的算法是总是选择第一个地址。VRRP通告报文（VRRP advertisements）总是使用主IP地址作为数具包的源地址。
+Master路由（Virtual Router Master） 承担转发发送给虚拟路由IP地址的数具包和应答对虚拟路由IP地址的ARP请求职责的VRRP路由。如果存在IP地址拥有者，则它总会成为Master。
+Backup路由（Virtual Router Backup） 当前Master路由失效时，可以继续承担转发职责的VRRP路由，可以存在多个。
+虚拟路由IP地址（IP address(es) associated with the virtual router） 虚拟路由在局域网中关联的IP地址，一个虚拟路由可以具有多个IP地址。
+虚拟路由MAC地址 主要功能 IP地址备份 IP地址备份是VRRP协议的主要功能。提供Master路由选举的同时还附带以下功能，协议力求：
+- 最小化黑洞时间
+- 最小化稳定状态的带宽占用和处理复杂度
+- 可用于各种支持IP流量的多路访问局域网技术
+- 提供多个虚拟路由的选举以实现负载均衡
+- 单个网段内多个逻辑IP子网的支持
+偏好路径指示 简单的Master选举模式就是把每个路由器作为Master对等地处理，竞争出胜利的一个。 但是，在一组冗余路由器中可能存在许多不同的偏好（或偏好范围）。 例如，该偏好可以基于访问链路的成本或速度，路由器性能或可靠性或其他策略考虑。 该协议应该允许以直观的方式表达该相对路径偏好，并且保证主集中到当前可用的最优路由器。
+最小化不必要的服务中断 一旦执行了Master选举，Master路由器和Backup路由器之间的任何不必要的转换都可能导致服务中断。 在Master选举之后，协议应该确保只要Master继续正常工作，任何优先级等于或者低于它的备份路由器都不会触发状态转换。
+扩展的局域网之上的高效操作 在多路访问局域网上发送IP数据包需要从IP地址映射到MAC地址。 在使用自学习网桥（透明网桥）的扩展局域网中使用虚拟路由器MAC地址会对发送到虚拟路由器的数具包的带宽开销具有显著的影响。 如果虚拟路由器MAC地址从不被用作链路层数据帧中的源地址，那么该station位置永远不会被学习，导致发送到虚拟路由器的所有数具包泛滥（flooding）。 为了提高这种环境下的效率，协议应该：
+- 使用虚拟路由器MAC地址作为Master发送的数据包中的源地址，以触发station学习
+- 转换到Master状态后立即触发一个消息以更新station学习缓存" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://jinzhao.info/post/vrrp-protocol/" />
+<meta property="article:published_time" content="2017-12-30T16:08:31+08:00" />
+<meta property="article:modified_time" content="2017-12-30T16:08:31+08:00" />
 
 
-
-
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="Lambda" />
-<meta name="msapplication-tooltip" content="Lambda" />
-<meta name='msapplication-navbutton-color' content="#5fbf5e" />
-<meta name="msapplication-TileColor" content="#5fbf5e" />
-<meta name="msapplication-TileImage" content="/img/tile-image-windows.png" />
-<link rel="icon" href="https://jinzhao.info/img/favicon.ico" />
-<link rel="icon" type="image/png" sizes="16x16" href="https://jinzhao.info/img/favicon-16x16.png" />
-<link rel="icon" type="image/png" sizes="32x32" href="https://jinzhao.info/img/favicon-32x32.png" />
-<link rel="icon" sizes="192x192" href="https://jinzhao.info/img/touch-icon-android.png" />
-<link rel="apple-touch-icon" href="https://jinzhao.info/img/touch-icon-apple.png" />
-<link rel="mask-icon" href="https://jinzhao.info/img/safari-pinned-tab.svg" color="#5fbf5e" />
-
-
-
-<link rel="stylesheet" href="//cdn.bootcss.com/video.js/6.2.8/alt/video-js-cdn.min.css" />
-
-<link rel="stylesheet" href="https://jinzhao.info/css/bundle.css" />
-
-
-  
-  <!--[if lt IE 9]>
-    <script src="//cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-    <script src="//cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
-    <script src="//cdn.bootcss.com/video.js/6.2.8/ie8/videojs-ie8.min.js"></script>
-  <![endif]-->
-
-<!--[if lte IE 11]>
-    <script src="//cdn.bootcss.com/classlist/1.1.20170427/classList.min.js"></script>
-  <![endif]-->
-
-
-<script src="//cdn.bootcss.com/object-fit-images/3.2.3/ofi.min.js"></script>
-
-
-<script src="//cdn.bootcss.com/smooth-scroll/12.1.4/js/smooth-scroll.polyfills.min.js"></script>
-
-
-</head>
+  </head>
   <body>
-    
-    <div class="suspension">
-      <a title="Go to top" class="to-top is-hide"><span class="icon icon-up"></span></a>
-      
+    <header class="app-header">
+      <a href="https://jinzhao.info/"><img class="app-header-avatar" src="https://jinzhao.info/img/avatar.jpg" alt="jin.zhao" /></a>
+      <h1>Lambda</h1>
+      <p>Calculations and Programming</p>
+      <div class="app-header-social">
         
-      
-    </div>
-    
-    
-  <header class="site-header">
-  <img class="avatar" src="https://jinzhao.info/img/avatar.jpg" alt="Avatar">
-  
-  <h2 class="title">Lambda</h2>
-  
-  <p class="subtitle">Calculations and Programming</p>
-  <button class="menu-toggle" type="button">
-    <span class="icon icon-menu"></span>
-  </button>
-  <nav class="site-menu collapsed">
-    <h2 class="offscreen">Main Menu</h2>
-    <ul class="menu-list">
-      
-      
-      
-      
-        <li class="menu-item
-            
-            
-            
-              is-active
-            ">
-            <a href="https://jinzhao.info/">Home</a>
-          </li>
-      
-        <li class="menu-item
-            
-            
-            ">
-            <a href="https://jinzhao.info/post/">Posts</a>
-          </li>
-      
-        <li class="menu-item
-            
-            
-            ">
-            <a href="https://jinzhao.info/categories/">Categories</a>
-          </li>
-      
-        <li class="menu-item
-            
-            
-            ">
-            <a href="https://jinzhao.info/tags/">Tags</a>
-          </li>
-      
-    </ul>
-  </nav>
-  <nav class="social-menu collapsed">
-    <h2 class="offscreen">Social Networks</h2>
-    <ul class="social-list">
-
-      
-
-      
-      <li class="social-item">
-        <a href="//github.com/JinWuZhao" title="GitHub"><span class="icon icon-github"></span></a>
-      </li>
-
-      
-
-      
-
-      
-
-      
-
-      
-
-      
-
-      
-
-      
-
-      
-
-      
-
-      
-
-      
-
-      
-
-      
-
-      
-
-      
-
-      
-
-      
-
-      
-
-      <li class="social-item">
-        <a href="https://jinzhao.info/index.xml"><span class="icon icon-rss" title="RSS"></span></a>
-      </li>
-
-    </ul>
-  </nav>
-</header>
-
-  <section class="main post-detail">
-    <header class="post-header">
-      <h1 class="post-title">虚拟路由冗余协议（VRRP）详解</h1>
-      <p class="post-meta">@jin.zhao · Dec 30, 2017 · 1 min read</p>
+          <a target="_blank" href="https://github.com/jinwuzhao" rel="noreferrer noopener"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-github">
+  <title>github</title>
+  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+</svg></a>
+        
+      </div>
     </header>
-    <article class="post-content">
+    <main class="app-container">
+      
+  <article class="post">
+    <header class="post-header">
+      <h1 class ="post-title">虚拟路由冗余协议（VRRP）详解</h1>
+      <div class="post-meta">
+        <div>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-calendar">
+  <title>calendar</title>
+  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>
+</svg>
+          Dec 30, 2017
+        </div>
+        <div>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-clock">
+  <title>clock</title>
+  <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
+</svg>
+          3 min read
+        </div><div>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tag">
+  <title>tag</title>
+  <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line>
+</svg>
+          <a class="tag" href="https://jinzhao.info/tags/vrrp/">VRRP</a></div></div>
+    </header>
+    <div class="post-content">
+      
 
-<h2 id="vrrp状态切换流程">VRRP状态切换流程</h2>
+<p>虚拟路由冗余协议（Virtual Router Redundancy Protocol，简称VRRP）用来消除静态默认路由环境下的单点故障。VRRP阐述了局域网中动态分配职责的选举协议。</p>
 
-<p><img src="https://jinzhao.info/vrrp-protocol/vrrp-state-simple.png" alt="vrrp-state" /><br />
-<a href="https://jinzhao.info/vrrp-protocol/vrrp-state.png">详细大图</a></p>
+<h2 id="一些基本定义">一些基本定义</h2>
+
+<h3 id="vrrp路由-vrrp-router">VRRP路由（VRRP Router）</h3>
+
+<p>运行VRRP协议的路由设备，它可以参与组成一个或者多个虚拟路由。</p>
+
+<h3 id="虚拟路由-virtual-router">虚拟路由（Virtual Router）</h3>
+
+<p>一个受VRRP协议管理的抽象对象，作为一个共享局域网中的默认路由。它由一个虚拟路由ID（Virtual Router Identifier）和一个或多个关联的IP地址组成。一个VRRP路由可以备份一个或多个虚拟路由。</p>
+
+<h3 id="ip地址拥有者-ip-address-owner">IP地址拥有者（IP Address Owner）</h3>
+
+<p>将虚拟路由的IP地址作为真实接口地址的VRRP路由。这个设备可以响应发往虚拟路由IP地址的各类协议的数具包如ICMP pings、TCP连接等等。</p>
+
+<h3 id="主ip地址-primary-ip-address">主IP地址（Primary IP Address）</h3>
+
+<p>从多个真实接口地址中选择出来的IP地址。一个可选的算法是总是选择第一个地址。VRRP通告报文（VRRP advertisements）总是使用主IP地址作为数具包的源地址。</p>
+
+<h3 id="master路由-virtual-router-master">Master路由（Virtual Router Master）</h3>
+
+<p>承担转发发送给虚拟路由IP地址的数具包和应答对虚拟路由IP地址的ARP请求职责的VRRP路由。如果存在IP地址拥有者，则它总会成为Master。</p>
+
+<h3 id="backup路由-virtual-router-backup">Backup路由（Virtual Router Backup）</h3>
+
+<p>当前Master路由失效时，可以继续承担转发职责的VRRP路由，可以存在多个。</p>
+
+<h3 id="虚拟路由ip地址-ip-address-es-associated-with-the-virtual-router">虚拟路由IP地址（IP address(es) associated with the virtual router）</h3>
+
+<p>虚拟路由在局域网中关联的IP地址，一个虚拟路由可以具有多个IP地址。</p>
+
+<h3 id="虚拟路由mac地址">虚拟路由MAC地址</h3>
+
+<h2 id="主要功能">主要功能</h2>
+
+<h3 id="ip地址备份">IP地址备份</h3>
+
+<p>IP地址备份是VRRP协议的主要功能。提供Master路由选举的同时还附带以下功能，协议力求：<br />
+- 最小化<a href="https://en.wikipedia.org/wiki/Black_hole_(networking)">黑洞</a>时间<br />
+- 最小化稳定状态的带宽占用和处理复杂度<br />
+- 可用于各种支持IP流量的多路访问局域网技术<br />
+- 提供多个虚拟路由的选举以实现负载均衡<br />
+- 单个网段内多个逻辑IP子网的支持</p>
+
+<h3 id="偏好路径指示">偏好路径指示</h3>
+
+<p>简单的Master选举模式就是把每个路由器作为Master对等地处理，竞争出胜利的一个。 但是，在一组冗余路由器中可能存在许多不同的偏好（或偏好范围）。 例如，该偏好可以基于访问链路的成本或速度，路由器性能或可靠性或其他策略考虑。 该协议应该允许以直观的方式表达该相对路径偏好，并且保证主集中到当前可用的最优路由器。</p>
+
+<h3 id="最小化不必要的服务中断">最小化不必要的服务中断</h3>
+
+<p>一旦执行了Master选举，Master路由器和Backup路由器之间的任何不必要的转换都可能导致服务中断。 在Master选举之后，协议应该确保只要Master继续正常工作，任何优先级等于或者低于它的备份路由器都不会触发状态转换。</p>
+
+<h3 id="扩展的局域网之上的高效操作">扩展的局域网之上的高效操作</h3>
+
+<p>在多路访问局域网上发送IP数据包需要从IP地址映射到MAC地址。 在使用<a href="https://en.wikipedia.org/wiki/Bridging_(networking)">自学习网桥（透明网桥）</a>的扩展局域网中使用虚拟路由器MAC地址会对发送到虚拟路由器的数具包的带宽开销具有显著的影响。 如果虚拟路由器MAC地址从不被用作链路层数据帧中的源地址，那么该<a href="https://en.wikipedia.org/wiki/Station_(networking)">station</a>位置永远不会被学习，导致发送到虚拟路由器的所有数具包泛滥（flooding）。 为了提高这种环境下的效率，协议应该：<br />
+- 使用虚拟路由器MAC地址作为Master发送的数据包中的源地址，以触发station学习<br />
+- 转换到Master状态后立即触发一个消息以更新station学习缓存<br />
+- 触发Master的周期性消息来维护station学习缓存</p>
+
+<h2 id="vrrp概要">VRRP概要</h2>
+
+<p>VRRP阐述了虚拟路由的选举协议。协议所有的消息使用IP多播数据报来发送，因此协议可以作用于各种支持IP多播的多路局域网技术。每个虚拟路器由都被分配一个IEEE 802标准的48位MAC地址。虚拟路由的MAC地址被用于所有Master路由发送的周期性的VRRP消息的源地址，用于在扩展的局域网中开启网桥学习功能。<br />
+一个虚拟路由被定义成一个虚拟路由ID（VRID）和一组IP地址。一个VRRP路由可能关联一个使用真实接口地址的虚拟路由，并且也可能被额配置的虚拟路由中被设定为Backup路由。VRID与地址之间的映射对于所有VRIP路由器来说必须是正交的。然而，并不妨碍重用一个VRID在不同的网段中与不同的地址映射。每个虚拟路由的作用域仅仅限制在单独的局域网中。<br />
+为了最小化占用网络流量，每个虚拟路由中只有Master路由发送周期性的的VRRP公告消息。Backup路由不会试图去抢占Master除非它有更高的优先级。这条规则消除了服务中断除非有更优的路径可用。也有可能出于管理的需要禁止所有抢占行为。唯一的例外是IP拥有者总是会成为Master路由。如果Master路由变得不可用则短暂的延时后最高优先级的Backup路由会切换为Master路由，以提供最小化服务中断的虚拟路由职责的切换控制。<br />
+VRRP协议设计提供迅速的从Backup到Master的最小化服务中断的切换方法，并包含减少协议为了保证Master在典型场景下控制切换的复杂度的优化。这个优化导致了最小化的运行时状态需求、最小激活的协议状态以及单独的消息类型和发送者。典型的运营场景是定义两个冗余路由并且／或者对于每个路由区分偏好路径。不遵循这些假设的（例如超过两个冗余路由路径偏好完全相同）的副作用是选举Master时会有短暂的周期重复转发数据包。然而这些典型场景的假设似乎可以覆盖绝大多数的部署方式，低频的Master丢失、预期的Master选举间隔非常小（远小于1秒）。因此当遭到极小概率的短暂网络破坏的时候VRRP的优化在协议设计中表现出很有效的简化。</p>
+
+<h2 id="配置样例">配置样例</h2>
+
+<h3 id="简单的vrrp路由的网络">简单的VRRP路由的网络</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-plain" data-lang="plain">            +-----------+      +-----------+
+            |   Rtr1    |      |   Rtr2    |
+            |(MR VRID=1)|      |(BR VRID=1)|
+            |           |      |           |
+    VRID=1  +-----------+      +-----------+
+    IP A ----------&gt;*            *&lt;--------- IP B
+                    |            |
+                    |            |
+  ------------------|------------|-----|--------|--------|--------|--
+                                       ^        ^        ^        ^
+                                       |        |        |        |
+                                     (IP A)   (IP A)   (IP A)   (IP A)
+                                       |        |        |        |
+                                    +--|--+  +--|--+  +--|--+  +--|--+
+                                    |  H1 |  |  H2 |  |  H3 |  |  H4 |
+                                    +-----+  +-----+  +--|--+  +--|--+
+     Legend:
+              ---|---|---|--  =  Ethernet, Token Ring, or FDDI
+                           H  =  Host computer
+                          MR  =  Master Router
+                          BR  =  Backup Router
+                           *  =  IP Address
+                        (IP)  =  default router for hosts             </code></pre></div>
+<h3 id="同时配置多个虚拟路由实现vrrp路由负载均衡">同时配置多个虚拟路由实现VRRP路由负载均衡</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-plain" data-lang="plain">            +-----------+      +-----------+
+            |   Rtr1    |      |   Rtr2    |
+            |(MR VRID=1)|      |(BR VRID=1)|
+            |(BR VRID=2)|      |(MR VRID=2)|
+    VRID=1  +-----------+      +-----------+  VRID=2
+    IP A ----------&gt;*            *&lt;---------- IP B
+                    |            |
+                    |            |
+  ------------------|------------|-----|--------|--------|--------|--
+                                       ^        ^        ^        ^
+                                       |        |        |        |
+                                     (IP A)   (IP A)   (IP B)   (IP B)
+                                       |        |        |        |
+                                    +--|--+  +--|--+  +--|--+  +--|--+
+                                    |  H1 |  |  H2 |  |  H3 |  |  H4 |
+                                    +-----+  +-----+  +--|--+  +--|--+
+     Legend:
+              ---|---|---|--  =  Ethernet, Token Ring, or FDDI
+                           H  =  Host computer
+                          MR  =  Master Router
+                          BR  =  Backup Router
+                           *  =  IP Address
+                        (IP)  =  default router for hosts             </code></pre></div>
+<h2 id="协议数据包格式">协议数据包格式</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-plain" data-lang="plain">    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-+
+   |Version| Type  | Virtual Rtr ID|   Priority    | Count IP Addrs|
+   +-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-+
+   |   Auth Type   |   Adver Int   |          Checksum             |
+   +-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-+
+   |                         IP Address (1)                        |
+   +-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-+
+   |                            .                                  |
+   |                            .                                  |
+   |                            .                                  |
+   +-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-+
+   |                         IP Address (n)                        |
+   +-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-+
+   |                     Authentication Data (1)                   |
+   +-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-+
+   |                     Authentication Data (2)                   |
+   +-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-+</code></pre></div>
+<h3 id="ip协议字段描述">IP协议字段描述</h3>
+
+<h4 id="source-address">Source Address</h4>
+
+<p>被发送的数据包的源地址，固定为主IP地址。</p>
+
+<h4 id="destination-address">Destination Address</h4>
+
+<p>IANA分配给VRRP协议的IP多播地址：224.0.0.18。这是一个本地链路层的多播地址。路由器不能忽略TTL转发这个这个目的地址的数据报。</p>
+
+<h4 id="ttl">TTL</h4>
+
+<p>TTL必须设为255。如果VRRP路由器收到TTL不等于255的数据包则必须丢弃。</p>
+
+<h4 id="protocol">Protocol</h4>
+
+<p>IANA分配给VRRP的IP协议号：112（十进制）。</p>
+
+<h3 id="vrrp协议字段描述">VRRP协议字段描述</h3>
+
+<h4 id="version">Version</h4>
+
+<h4 id="type">Type</h4>
+
+<h4 id="virtual-rtr-id-vrid">Virtual Rtr ID (VRID)</h4>
+
+<h4 id="priority">Priority</h4>
+
+<h4 id="count-ip-addrs">Count IP Addrs</h4>
+
+<h4 id="authentication-type">Authentication Type</h4>
+
+<h4 id="advertisement-interval-adver-int">Advertisement Interval (Adver Int)</h4>
+
+<h4 id="checksum">Checksum</h4>
+
+<h4 id="ip-address-es">IP Address(es)</h4>
+
+<h4 id="authentication-data">Authentication Data</h4>
+
+<h2 id="协议状态机">协议状态机</h2>
+
+<h3 id="每个虚拟路由的参数">每个虚拟路由的参数</h3>
+
+<h4 id="vrid">VRID</h4>
+
+<h4 id="priority-1">Priority</h4>
+
+<h4 id="ip-addresses">IP_Addresses</h4>
+
+<h4 id="advertisement-interval">Advertisement_Interval</h4>
+
+<h4 id="skew-time">Skew_Time</h4>
+
+<h4 id="master-down-interval">Master_Down_Interval</h4>
+
+<h4 id="preempt-mode">Preempt_Mode</h4>
+
+<h4 id="authentication-type-1">Authentication_Type</h4>
+
+<h4 id="authentication-data-1">Authentication_Data</h4>
+
+<h3 id="计时器">计时器</h3>
+
+<h4 id="master-down-timer">Master_Down_Timer</h4>
+
+<h4 id="adver-timer">Adver_Timer</h4>
+
+<h3 id="vrrp状态切换图表">VRRP状态切换图表</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-plain" data-lang="plain">                      +---------------+
+           +---------&gt;|               |&lt;-------------+
+           |          |  Initialize   |              |
+           |   +------|               |----------+   |
+           |   |      +---------------+          |   |
+           |   |                                 |   |
+           |   V                                 V   |
+   +---------------+                       +---------------+
+   |               |----------------------&gt;|               |
+   |    Master     |                       |    Backup     |
+   |               |&lt;----------------------|               |
+   +---------------+                       +---------------+</code></pre></div>
+<p><img src="https://jinzhao.info/vrrp-protocol/vrrp-state.png" alt="vrrp-state" /><br />
+<a href="https://jinzhao.info/vrrp-protocol/vrrp-state.png">点击看大图</a></p>
 
 <h2 id="todo">TODO</h2>
-</article>
-    <footer class="post-footer">
+
+    </div>
+    <div class="post-footer">
       
-      <ul class="post-tags">
-        
-          <li><a href="https://jinzhao.info/tags/vrrp"><span class="tag">VRRP</span></a></li>
-        
-      </ul>
-      
-      <p class="post-copyright">
-        ©jinzhao.info
-      </p>
-    </footer>
-    
-      
-    
-  </section>
-  <footer class="site-footer">
-  <p>© 2017 Lambda</p>
-  <p>Powered by <a href="https://gohugo.io/" target="_blank">Hugo</a> with theme <a href="https://github.com/laozhu/hugo-nuo" target="_blank">Nuo</a>.</p>
-  
-</footer>
+    </div>
+  </article>
 
-
-
-<script async src="//cdn.bootcss.com/video.js/6.2.8/alt/video.novtt.min.js"></script>
-<script async src="//cdn.bootcss.com/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [['$','$'], ['\\(','\\)']],
-      displayMath: [['$$','$$'], ['\[','\]']],
-      processEscapes: true,
-      processEnvironments: true,
-      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
-      TeX: { equationNumbers: { autoNumber: "AMS" },
-      extensions: ["AMSmath.js", "AMSsymbols.js"] }
-    }
-  });
-</script>
-<script type="text/x-mathjax-config">
-  // Fix <code> tags after MathJax finishes running. This is a
-  // hack to overcome a shortcoming of Markdown. Discussion at
-  // https://github.com/mojombo/jekyll/issues/199
-  MathJax.Hub.Queue(() => {
-    MathJax.Hub.getAllJax().map(v => v.SourceElement().parentNode.className += ' has-jax');
-  });
-</script>
-
-<script src="https://jinzhao.info/js/bundle.js"></script>
-
-
-
-
+    </main>
   </body>
 </html>

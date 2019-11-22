@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Categories on Lambda</title>
@@ -6,28 +6,10 @@
     <description>Recent content in Categories on Lambda</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <copyright>©jinzhao.info</copyright>
+    <lastBuildDate>Sat, 30 Dec 2017 16:08:31 +0800</lastBuildDate>
     
 	<atom:link href="https://jinzhao.info/categories/index.xml" rel="self" type="application/rss+xml" />
     
-    
-    <item>
-      <title>工具</title>
-      <link>https://jinzhao.info/categories/%E5%B7%A5%E5%85%B7/</link>
-      <pubDate>Thu, 28 Dec 2017 16:59:15 +0800</pubDate>
-      
-      <guid>https://jinzhao.info/categories/%E5%B7%A5%E5%85%B7/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>程序语言</title>
-      <link>https://jinzhao.info/categories/%E7%A8%8B%E5%BA%8F%E8%AF%AD%E8%A8%80/</link>
-      <pubDate>Thu, 28 Dec 2017 16:59:15 +0800</pubDate>
-      
-      <guid>https://jinzhao.info/categories/%E7%A8%8B%E5%BA%8F%E8%AF%AD%E8%A8%80/</guid>
-      <description></description>
-    </item>
     
     <item>
       <title>网络协议</title>
@@ -44,6 +26,24 @@
       <pubDate>Sat, 30 Dec 2017 16:08:31 +0800</pubDate>
       
       <guid>https://jinzhao.info/categories/%E9%AB%98%E5%8F%AF%E7%94%A8/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>工具</title>
+      <link>https://jinzhao.info/categories/%E5%B7%A5%E5%85%B7/</link>
+      <pubDate>Thu, 28 Dec 2017 16:59:15 +0800</pubDate>
+      
+      <guid>https://jinzhao.info/categories/%E5%B7%A5%E5%85%B7/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>程序语言</title>
+      <link>https://jinzhao.info/categories/%E7%A8%8B%E5%BA%8F%E8%AF%AD%E8%A8%80/</link>
+      <pubDate>Thu, 28 Dec 2017 16:59:15 +0800</pubDate>
+      
+      <guid>https://jinzhao.info/categories/%E7%A8%8B%E5%BA%8F%E8%AF%AD%E8%A8%80/</guid>
       <description></description>
     </item>
     

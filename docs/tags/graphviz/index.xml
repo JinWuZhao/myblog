@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Graphviz on Lambda</title>
@@ -6,7 +6,6 @@
     <description>Recent content in Graphviz on Lambda</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <copyright>©jinzhao.info</copyright>
     <lastBuildDate>Thu, 28 Dec 2017 16:59:15 +0800</lastBuildDate>
     
 	<atom:link href="https://jinzhao.info/tags/graphviz/index.xml" rel="self" type="application/rss+xml" />
@@ -24,7 +23,7 @@ Graphviz Graphviz是一个自动化绘图的工具，用于绘制DOT语言描述
 QuickStart 废话不多说，先上个例子，安装配置不讲了自己找。
 假设我们描述一个简单的解释器的执行流程：
 1. 获取输入（getInput) 2. 解析输入字符串（parse），成功转到3，失败转到5 3. 对parse出的AST求值（evaluate），成功转到4，失败转到6 4. 输出求值结果（putResult） 5. 提示语法错误（throwSyntaxError） 6. 求值过程出现异常，比如除0等（throwRuntimeError） 创建一个文件，名为interpreter.dot，并写入以下代码：
-digraph Interpreter { getInput -&amp;gt; parse -&amp;gt; evaluate -&amp;gt; putResult; parse -&amp;gt; throwSyntaxError; evaluate -&amp;gt; throwRuntimeError; } 在终端执行以下命令：
+digraph Interpreter { getInput -&amp;gt; parse -&amp;gt; evaluate -&amp;gt; putResult; parse -&amp;gt; throwSyntaxError; evaluate -&amp;gt; throwRuntimeError; }  在终端执行以下命令：
 dot -Tpng interpreter.dot -o interpreter.png 于是就得到了下面这张图：
 这里生成的是png格式，也可以生成其它格式的文件，比如pprof生成的就是svg格式的。
 DOT语言介绍 这是Graphviz文档里的DOT语法：

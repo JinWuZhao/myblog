@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>网络协议 on Lambda</title>
@@ -6,7 +6,6 @@
     <description>Recent content in 网络协议 on Lambda</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <copyright>©jinzhao.info</copyright>
     <lastBuildDate>Sat, 30 Dec 2017 16:08:31 +0800</lastBuildDate>
     
 	<atom:link href="https://jinzhao.info/categories/%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/index.xml" rel="self" type="application/rss+xml" />
@@ -18,8 +17,25 @@
       <pubDate>Sat, 30 Dec 2017 16:08:31 +0800</pubDate>
       
       <guid>https://jinzhao.info/post/vrrp-protocol/</guid>
-      <description> VRRP状态切换流程 详细大图
-TODO </description>
+      <description>虚拟路由冗余协议（Virtual Router Redundancy Protocol，简称VRRP）用来消除静态默认路由环境下的单点故障。VRRP阐述了局域网中动态分配职责的选举协议。
+一些基本定义 VRRP路由（VRRP Router） 运行VRRP协议的路由设备，它可以参与组成一个或者多个虚拟路由。
+虚拟路由（Virtual Router） 一个受VRRP协议管理的抽象对象，作为一个共享局域网中的默认路由。它由一个虚拟路由ID（Virtual Router Identifier）和一个或多个关联的IP地址组成。一个VRRP路由可以备份一个或多个虚拟路由。
+IP地址拥有者（IP Address Owner） 将虚拟路由的IP地址作为真实接口地址的VRRP路由。这个设备可以响应发往虚拟路由IP地址的各类协议的数具包如ICMP pings、TCP连接等等。
+主IP地址（Primary IP Address） 从多个真实接口地址中选择出来的IP地址。一个可选的算法是总是选择第一个地址。VRRP通告报文（VRRP advertisements）总是使用主IP地址作为数具包的源地址。
+Master路由（Virtual Router Master） 承担转发发送给虚拟路由IP地址的数具包和应答对虚拟路由IP地址的ARP请求职责的VRRP路由。如果存在IP地址拥有者，则它总会成为Master。
+Backup路由（Virtual Router Backup） 当前Master路由失效时，可以继续承担转发职责的VRRP路由，可以存在多个。
+虚拟路由IP地址（IP address(es) associated with the virtual router） 虚拟路由在局域网中关联的IP地址，一个虚拟路由可以具有多个IP地址。
+虚拟路由MAC地址 主要功能 IP地址备份 IP地址备份是VRRP协议的主要功能。提供Master路由选举的同时还附带以下功能，协议力求：
+- 最小化黑洞时间
+- 最小化稳定状态的带宽占用和处理复杂度
+- 可用于各种支持IP流量的多路访问局域网技术
+- 提供多个虚拟路由的选举以实现负载均衡
+- 单个网段内多个逻辑IP子网的支持
+偏好路径指示 简单的Master选举模式就是把每个路由器作为Master对等地处理，竞争出胜利的一个。 但是，在一组冗余路由器中可能存在许多不同的偏好（或偏好范围）。 例如，该偏好可以基于访问链路的成本或速度，路由器性能或可靠性或其他策略考虑。 该协议应该允许以直观的方式表达该相对路径偏好，并且保证主集中到当前可用的最优路由器。
+最小化不必要的服务中断 一旦执行了Master选举，Master路由器和Backup路由器之间的任何不必要的转换都可能导致服务中断。 在Master选举之后，协议应该确保只要Master继续正常工作，任何优先级等于或者低于它的备份路由器都不会触发状态转换。
+扩展的局域网之上的高效操作 在多路访问局域网上发送IP数据包需要从IP地址映射到MAC地址。 在使用自学习网桥（透明网桥）的扩展局域网中使用虚拟路由器MAC地址会对发送到虚拟路由器的数具包的带宽开销具有显著的影响。 如果虚拟路由器MAC地址从不被用作链路层数据帧中的源地址，那么该station位置永远不会被学习，导致发送到虚拟路由器的所有数具包泛滥（flooding）。 为了提高这种环境下的效率，协议应该：
+- 使用虚拟路由器MAC地址作为Master发送的数据包中的源地址，以触发station学习
+- 转换到Master状态后立即触发一个消息以更新station学习缓存</description>
     </item>
     
   </channel>
